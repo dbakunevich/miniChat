@@ -3,13 +3,15 @@
 #include <vector>
 #include <chrono>
 #include <fstream>
-
-
+#include "User.h"
 
 using namespace std;
 
-
-
+void printTime(int time, char delimiter) {
+    if (time < 10)
+        cout << 0;
+    cout << time << delimiter;
+}
 
 int main() {
     string nameOfFile;
@@ -19,11 +21,11 @@ int main() {
     int numOfUsers = 0;
     cin >> numOfUsers;
 
-    vector <pair<int, string>> users;
+    vector <User> users;
 
-    std::ofstream logFile;
-    logFile.open(nameOfFile, std::ios_base::out);
-    std::cout.rdbuf(logFile.rdbuf());
+    std::ofstream chatFile;
+    chatFile.open(nameOfFile, std::ios_base::out);
+    std::cout.rdbuf(chatFile.rdbuf());
 
     for (int i = 0; i < numOfUsers; ++i) {
         int delay;
@@ -31,26 +33,29 @@ int main() {
         cin >> delay;
         getline(cin, message);
 
-        users.emplace_back(make_pair(delay, message));
+        User currentUser(delay, message);
+
+        users.push_back(currentUser);
 
     }
 
+
     long long secCounter = 0;
-    time_t now1 = time(0);
-    while (true) {
-        time_t now = time(0);
+    time_t now1 = time(nullptr);
+    while (secCounter != LONG_LONG_MAX) {
+        time_t now = time(nullptr);
         tm *ltm = localtime(&now);
 
         if (now - now1 >= 1) {
             for (int i = 0; i < users.capacity(); ++i) {
-                if (secCounter % users[i].first == 0 && secCounter != 0){
-                    cout << "Time: "<< 1 + ltm->tm_hour << ":";
-                    cout << 1 + ltm->tm_min << ":";
-                    if (1 + ltm->tm_sec < 10)
-                        cout << 0;
-                    cout << 1 + ltm->tm_sec << ", ";
-                    cout << "User id: " << i << "\t";
-                    cout << users[i].second << endl;
+                if (secCounter % users[i].getDelay() == 0 && secCounter != 0){
+                    cout << "Time: ";
+                    printTime(ltm->tm_hour, ':');
+                    printTime(ltm->tm_min, ':');
+                    printTime(ltm->tm_sec, ',');
+                    cout << " User id: " << users[i].getId() << "\t";
+                    cout << users[i].getMessage() << endl;
+                    flush(cout);
                 }
             }
             secCounter++;
@@ -58,12 +63,3 @@ int main() {
         }
     }
 }
-
-/*
- *
-Q:\CProjects\miniChat\chat.txt
-3
-2 Dima
-3 Nikita
-5 Sasha
- */

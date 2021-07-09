@@ -3,4 +3,4 @@ project(miniChat)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(miniChat main.cpp)
+add_executable(miniChat main.cpp User.cpp User.h)
